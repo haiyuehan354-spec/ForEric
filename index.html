@@ -106,7 +106,7 @@ function question(q){
 }
 function render(){page.replaceChildren();page.className="";void page.offsetWidth;page.className="page";message("");$("bar").style.width=(state.step===0?0:state.step<=4?(state.step-1+(state.memory?1:0))/4*100:100)+"%";
 switch(state.step){
-case 0:add("small","序章 · A LETTER FOR YOU");add("h1","我们的故事");add("p",CONFIG.names+"：\n这是一封藏在时光里的信。\n我们已经一起走过 "+days()+" 天。\n今天，想邀请你重新翻开我们的故事。");nav(()=>{if(!audioStarted)toggleMusic();move(1)},"拆开信封 ♡");break;
+case 0:add("small","序章 · A LETTER FOR YOU");add("h1","For Eric");add("p",CONFIG.names+"：\n第一次以这样的形式来给你写信。\n我们已经一起走过 "+days()+" 天。\n今天，想邀请你重新翻开我们的故事。");nav(()=>{if(!audioStarted)toggleMusic();move(1)},"拆开信封 ♡");break;
 case 1: case 2: case 3: case 4: question(QUESTIONS[state.step-1]);break;
 case 5:add("small","番外 · 时光收藏夹");add("h2","把日子装进相册");let grid=add("div",undefined,"photos");GALLERY.forEach(p=>{let b=button("",()=>{if(img.complete&&img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("这张照片还等待你放入 assets 文件夹。")},"photo");let img=el("img");img.alt=p.caption;let ph=el("div","待收藏的照片","placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));grid.append(b)});nav(()=>{move(6);fireworks()},"开启最终惊喜 ♡");break;
 case 6:add("small","终章 · HAPPY ANNIVERSARY");add("h1","Happy Anniversary！");add("p",CONFIG.letter);page.append(button("再次点亮烟花",fireworks,"primary"),button("重新翻阅",()=>move(0)),button("清除记录",()=>{if(confirm("确定清除所有答题记录？")){state={step:0,answers:{},attempts:{},memory:false};save();render()}}));break;
