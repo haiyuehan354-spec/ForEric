@@ -329,7 +329,7 @@ function render(){cancelAnimationFrame(roomFrame);document.body.classList.toggle
 switch(state.step){
 case 0:{
 const home=add("div",undefined,"ticket-home");
-home.innerHTML=`<div class="love-ticket"><div class="ticket-main"><div class="ticket-kicker">SPECIAL INVITATION</div><div style="font-size:11px;font-style:italic;margin-top:8px">A little world, just for you.</div><div class="ticket-title">for eric</div><div class="ticket-subtitle">欢迎来到我们的小小世界</div><div class="ticket-stamp">ADMITTED</div><div class="ticket-details"><div><span>EDITION</span>NO.001</div><div><span>GUEST</span>ONLY YOU</div><div><span>VALID</span>FOREVER</div></div></div><button class="ticket-stub" aria-label="撕下副券进入">ADMIT ONE<br><span style="font-size:28px">♡</span><br>点击撕票<br>→</button></div><p class="ticket-hint">欢迎入园，玩得开心～</p>`;
+home.innerHTML=`<div class="love-ticket"><div class="ticket-main"><div class="ticket-kicker">SPECIAL INVITATION</div><div style="font-size:11px;font-style:italic;margin-top:8px">A little world, just for you.</div><div class="ticket-title">For Eric</div><div class="ticket-subtitle">Anniversary Theme park ticket</div><div class="ticket-stamp">ADMITTED</div><div class="ticket-details"><div><span>EDITION</span>NO.001</div><div><span>GUEST</span>Eric&amp;Fritos</div><div><span>VALID</span>FOREVER</div></div></div><button class="ticket-stub" aria-label="撕下副券进入">ADMIT ONE<br><span style="font-size:28px">♡</span><br>点击撕票<br>→</button></div><p class="ticket-hint">欢迎入园，玩得开心～</p>`;
 const stub=home.querySelector(".ticket-stub");stub.onclick=()=>{stub.disabled=true;stub.classList.add("ticket-torn");setTimeout(()=>{home.classList.add("ticket-exit");setTimeout(()=>move(7),450)},850)};break;}
 case 7:musicRoom();break;
 
