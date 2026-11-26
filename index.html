@@ -12,6 +12,12 @@ function days(){let n=new Date(),[y,m,d]=CONFIG.start.split("-").map(Number);ret
 function move(n){state.step=n;state.memory=false;save();render()}
 function nav(next,label="翻开下一页 →"){let n=add("div",undefined,"nav");if(state.step>0)n.append(button("← 上一页",()=>move(state.step-1)));else n.append(el("span"));n.append(button(label,next,"primary"))}
 function message(t){$("msg").textContent=t}
+const GALLERY = [
+    { src: "assets/gallery1.jpg", caption: "Time square" },
+    { src: "assets/gallery2.jpg", caption: "在波多黎各的一个海滩上" },
+    { src: "assets/gallery3.jpg", caption: "刚在一起的两个人" },
+    { src: "assets/gallery4.jpg", caption: "在雨林里变成两只猴子" },
+];
 const QUESTIONS = [
   {
     "key": "restaurant",
