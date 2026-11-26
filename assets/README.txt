@@ -1,0 +1,1 @@
+请放入 music.mp3 和 photo1.jpg 至 photo4.jpg。使用自己拥有授权的音乐与照片。
