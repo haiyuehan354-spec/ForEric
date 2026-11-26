@@ -85,7 +85,7 @@ function memory(q){
  add("h2",q.correct==="all"?"因为是你，所以全部喜欢。":"答对啦！");
  const b=button("",()=>{if(img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("请添加 "+p.src)},"photo memory-photo");
  const img=el("img");img.alt=p.caption;const ph=el("div","待收藏的照片 · "+p.src,"placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));page.append(b);
- add("p",["还记得那顿饭吗？吃完之后我们去了moma看展，那是属于我们第一次约会。","本命年手链，装着老公大大的心意。","我们会一起去很多次海边。","喜欢你的一切，因为所有这些东西构成了罗显乐。"][state.step-1]);
+ add("p",["还记得那顿饭吗？吃完之后我们去了moma看展，是我们第一次约会","本命年手链，装着老公大大的心意。","喜欢跟你旅行，我们会一起去很多次海边！","喜欢你的一切"][state.step-1]);
  const n=add("div",undefined,"nav");n.append(button("← 返回题目",()=>{state.memory=false;save();render()}),button(state.step===4?"打开我们的相册 →":"翻开下一页 →",()=>move(state.step+1),"primary"));
 }
 function question(q){
