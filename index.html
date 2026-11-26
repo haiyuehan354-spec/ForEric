@@ -112,10 +112,10 @@ const QUESTIONS = [
   {
     "key": "restaurant",
     "chapter": "第一章",
-    "title": "我们第一次去的餐厅是哪里？(o^^o)",
-    "intro": "还记得那一次一起吃饭的时光吗？",
+    "title": "我们第一次两个人去的餐厅是哪里？(o^^o)",
+    "intro": "好怀念！",
     "options": [
-      "奈哥",
+      "Five guys",
       "Pasta Corner",
       "吃鸡",
       "Shake Shack"
@@ -127,7 +127,7 @@ const QUESTIONS = [
     "key": "gift",
     "chapter": "第二章 · 第一份心意",
     "title": "你第一次送我的礼物是什么？",
-    "intro": "谢谢老公送来的宝格丽",
+    "intro": "谢谢老公 -3-",
     "options": [
       "鲜花",
       "香水",
@@ -143,10 +143,10 @@ const QUESTIONS = [
     "title": "我们第一次出去玩 去了哪里？(^^)",
     "intro": "阳光，海边和白沙滩",
     "options": [
-      "波多黎各",
+      "Purto Rick",
       "Tampa",
       "Coldspring",
-      "坎昆"
+      "Detroit"
     ],
     "correct": "Tampa",
     "hint": ""
@@ -155,7 +155,7 @@ const QUESTIONS = [
     "key": "love",
     "chapter": "第四章 · 爱",
     "title": "你觉得我最喜欢你什么？(^з^)-☆",
-    "intro": "多选题",
+    "intro": "猜猜看",
     "options": [
       "长得帅，身材好",
       "成熟，耐心，包容我",
@@ -181,7 +181,7 @@ function memory(q){
  add("h2",q.correct==="all"?"因为是你，所以全部喜欢。":"答对啦！");
  const b=button("",()=>{if(img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("请添加 "+p.src)},"photo memory-photo");
  const img=el("img");img.alt=p.caption;const ph=el("div","待收藏的照片 · "+p.src,"placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));page.append(b);
- add("p",["还记得那顿饭吗？吃完之后我们去了moma看展，是我们第一次约会","本命年手链，装着老公大大的心意。","喜欢跟你旅行，我们会一起去很多次海边！","喜欢你的一切"][state.step-1]);
+ add("p",["吃完之后我们去了moma看展，这是我们第一次约会哦～","本命年手链，装着老公大大的心意。","喜欢跟你旅行，我们会一起去很多次海边！","喜欢你的一切"][state.step-1]);
  const n=add("div",undefined,"nav");n.append(button("← 返回题目",()=>{state.memory=false;save();render()}),button(state.step===4?"去坐旋转木马 →":"翻开下一页 →",()=>move(state.step===4?9:state.step+1),"primary"));
 }
 function question(q){
@@ -237,7 +237,7 @@ function giftRoom(){
  state.prize??=0;
  state.letterOpened??=false;
  const heading=el("small","ERIC'S LUCKY MACHINE");
- room.append(heading,el("h1","专属于你的幸运扭蛋机"));
+ room.append(heading,el("h1","幸运扭蛋机"));
  const machinePanel=el("div"), prizePanel=el("div");
  room.append(machinePanel,prizePanel);
  let busy=false;
@@ -338,7 +338,7 @@ case 5:add("small","番外 · 时光收藏夹");add("h2","把日子装进相册"
 case 8:fireRoom();break;
 case 9:carouselRoom();break;
 case 10:giftRoom();break;
-case 6:add("small","终章 · HAPPY ANNIVERSARY");add("h1","一周年快乐 ♡");add("p","365天只是我们的开始。\n谢谢你走进我的小小世界，\n希望我们一起度过很多很多个周年纪念日。\n2025.12.03 — Forever ♡");page.append(button("← 返回扭蛋机",()=>move(10)),button("重新翻阅我们的故事",()=>move(0),"primary"));break;
+case 6:add("small","终章 · HAPPY ANNIVERSARY");add("h1","一周年快乐 ♡");add("p","365天只是我们的开始。\n谢谢你走进我的世界里，\n我爱你 \n2025.12.03 — Forever ");page.append(button("← 返回扭蛋机",()=>move(10)),button("重新翻阅我们的故事",()=>move(0),"primary"));break;
 }}
 let audioStarted=false,musicUnlocked=false;
 function syncMusicButton(){$("music").hidden=!musicUnlocked||state.step===0||state.step===7}
