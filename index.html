@@ -346,87 +346,447 @@ function resetMusic(){musicUnlocked=false;audioStarted=false;audio.pause();try{a
 async function toggleMusic(){if(!musicUnlocked)return;if(!audio.paused){audio.pause();$("music").textContent="♫ 播放音乐";return}try{await audio.play();audioStarted=true;$("music").textContent="Ⅱ 暂停音乐"}catch{message("请先添加 assets/music.mp3，再点击播放音乐。")}}$("music").onclick=toggleMusic;$("close").onclick=()=>$("viewer").close();
 
 let frame=0;
-function stopFireworks(){cancelAnimationFrame(frame);document.body.classList.remove("show-fireworks");const c=$("fx");const ctx=c.getContext("2d");ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height)}
+
+function stopFireworks(){
+  cancelAnimationFrame(frame);
+  frame=0;
+
+  document.body.classList.remove("show-fireworks");
+
+  const c=$("fx");
+  c.onclick=null;
+  c.style.pointerEvents="none";
+
+  const ctx=c.getContext("2d");
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,c.width,c.height);
+}
+
 function fireRoom(){
- const room=add("div",undefined,"fire-room");
- room.innerHTML=`<small>THE FINAL SURPRISE · MAKE A WISH</small><h1>为我们的故事点亮夜空</h1><p>点击烟花筒，送你一整片星空。</p><button class="fire-launch" aria-label="点燃烟花"><svg viewBox="0 0 180 230" aria-hidden="true"><defs><linearGradient id="tubeGold"><stop stop-color="#8d5b32"/><stop offset=".45" stop-color="#fff1b9"/><stop offset="1" stop-color="#a8733d"/></linearGradient></defs><ellipse cx="90" cy="211" rx="60" ry="10" fill="#001343" opacity=".6"/><g transform="rotate(-12 90 130)"><rect x="48" y="65" width="84" height="140" rx="9" fill="#16358e" stroke="#e8c983" stroke-width="3"/><path d="M49 88H131M49 184H131" stroke="url(#tubeGold)" stroke-width="15"/><ellipse cx="90" cy="65" rx="42" ry="13" fill="url(#tubeGold)"/><ellipse cx="90" cy="64" rx="31" ry="7" fill="#14214b"/><path d="M90 59Q120 34 107 19" fill="none" stroke="#e7c47d" stroke-width="3"/><text x="107" y="22" fill="#ffe5a4" font-size="24" text-anchor="middle">✦</text><text x="90" y="137" text-anchor="middle" fill="#f6de9d" font-size="40">✧</text><text x="90" y="160" text-anchor="middle" fill="#fff0c8" font-size="10" letter-spacing="2">FOR ERIC</text></g></svg></button><p class="fire-status" role="status">许个愿吧 ♡</p>`;
- const launch=room.querySelector("button"),status=room.querySelector(".fire-status");
- const n=add("div",undefined,"nav fire-nav");n.append(button("← 返回相册",()=>move(5)));const next=button("前往扭蛋机 →",()=>move(10),"primary");n.append(next);
- launch.onclick=()=>{launch.disabled=true;status.textContent="烟花正在绽放…";fireworks(()=>{if(!room.isConnected)return;launch.disabled=false;status.textContent="愿我们的故事永远闪闪发光 ♡";})};
+
+  const room=add("div",undefined,"fire-room");
+
+  room.innerHTML=`
+    <small>MAKE A WISH · FOR ERIC</small>
+    <h1>为我们的故事点亮夜空</h1>
+    <p>点击屏幕任意位置，点亮五朵烟花。</p>
+
+    <button class="fire-launch" aria-label="点燃烟花">
+      <svg viewBox="0 0 180 230">
+        <defs>
+          <linearGradient id="tubeGold">
+            <stop stop-color="#8d5b32"/>
+            <stop offset=".45" stop-color="#fff1b9"/>
+            <stop offset="1" stop-color="#a8733d"/>
+          </linearGradient>
+        </defs>
+
+        <ellipse cx="90" cy="211" rx="60" ry="10"
+          fill="#001343" opacity=".6"/>
+
+        <g transform="rotate(-12 90 130)">
+          <rect x="48" y="65" width="84" height="140"
+            rx="9" fill="#16358e"
+            stroke="#e8c983" stroke-width="3"/>
+
+          <path d="M49 88H131M49 184H131"
+            stroke="url(#tubeGold)" stroke-width="15"/>
+
+          <ellipse cx="90" cy="65" rx="42" ry="13"
+            fill="url(#tubeGold)"/>
+
+          <ellipse cx="90" cy="64" rx="31" ry="7"
+            fill="#14214b"/>
+
+          <path d="M90 59Q120 34 107 19"
+            fill="none" stroke="#e7c47d"
+            stroke-width="3"/>
+
+          <text x="107" y="22" fill="#ffe5a4"
+            font-size="24" text-anchor="middle">✦</text>
+
+          <text x="90" y="137" text-anchor="middle"
+            fill="#f6de9d" font-size="40">♡</text>
+
+          <text x="90" y="160" text-anchor="middle"
+            fill="#fff0c8" font-size="10"
+            letter-spacing="2">FOR ERIC</text>
+        </g>
+      </svg>
+    </button>
+
+    <p>许个愿吧 ♡</p>
+  `;
+
+  const c=$("fx");
+  const ctx=c.getContext("2d");
+
+  let count=0;
+  let shells=[];
+  let w=0,h=0;
+
+  const reduced=matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  const palettes=[
+    ["#749dff","#b4c9ff","#e9c7ff"],
+    ["#ff559e","#ff9dce","#ffe2f3"],
+    ["#65e6b6","#aaffcc","#e5ffef"],
+    ["#b18aff","#e5baff","#ffc4ef"],
+    ["#e9b55a","#ffd978","#fff1ca"]
+  ];
+
+  const nav=add("div",undefined,"nav fire-nav");
+
+  const back=button("← 返回相册",()=>move(5));
+
+  const counter=button(
+    "0 / 5 · 点亮烟花",
+    ()=>ignite(w/2,h*.40)
+  );
+
+  const next=button(
+    "前往扭蛋机 →",
+    ()=>move(10),
+    "primary"
+  );
+
+  nav.append(back,counter,next);
+
+  const greeting=add("div","Happy Anniversary");
+  greeting.hidden=true;
+
+  Object.assign(greeting.style,{
+    position:"fixed",
+    left:"0",
+    top:"40%",
+    width:"100%",
+    padding:"0 18px",
+    boxSizing:"border-box",
+    textAlign:"center",
+    fontFamily:"Georgia, serif",
+    fontStyle:"italic",
+    fontSize:"clamp(38px,8vw,100px)",
+    color:"#fff3d6",
+    textShadow:
+      "0 0 12px #ffdb91,0 0 35px #e7ab53,0 3px 12px #000",
+    zIndex:"25",
+    pointerEvents:"none",
+    animation:"appear 1.5s ease both"
+  });
+
+  function resize(){
+    const dpr=Math.min(devicePixelRatio||1,2);
+
+    w=innerWidth;
+    h=innerHeight;
+
+    c.width=Math.round(w*dpr);
+    c.height=Math.round(h*dpr);
+
+    c.style.width=w+"px";
+    c.style.height=h+"px";
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  resize();
+
+  // 让整个屏幕可以点击
+  c.style.pointerEvents="auto";
+  c.style.cursor="crosshair";
+
+  const rand=(a,b)=>a+Math.random()*(b-a);
+
+  // 爱心数学曲线
+  function heart(t){
+    return {
+      x:Math.pow(Math.sin(t),3),
+
+      y:-(13*Math.cos(t)
+         -5*Math.cos(2*t)
+         -2*Math.cos(3*t)
+         -Math.cos(4*t)+2.5)/17
+    };
+  }
+
+  function ignite(x,y){
+
+    if(count>=5)return;
+
+    if(w!==innerWidth||h!==innerHeight){
+      resize();
+    }
+
+    count++;
+
+    document.body.classList.add("show-fireworks");
+
+    counter.textContent=count+" / 5 · 点击夜空";
+
+    const radius=Math.min(w,h)*.42;
+
+    const colors=palettes[count-1];
+
+    const particles=[];
+
+    const multi=count===2||count===4;
+
+    if(multi){
+
+      // 大量小爱心组成一个大型烟花球
+
+      const groups=48;
+
+      for(let j=0;j<groups;j++){
+
+        const angle=j*2.399963;
+
+        const distance=
+          Math.sqrt((j+.5)/groups)*radius*.88;
+
+        const cx=Math.cos(angle)*distance;
+        const cy=Math.sin(angle)*distance;
+
+        const miniSize=radius*rand(.065,.13);
+
+        for(let k=0;k<26;k++){
+
+          const q=heart(k/26*Math.PI*2);
+
+          particles.push({
+            dx:cx,
+            dy:cy,
+            hx:q.x*miniSize,
+            hy:q.y*miniSize,
+            color:colors[k%colors.length],
+            life:rand(2.8,3.6),
+            width:rand(.9,1.7),
+            multi:true,
+            phase:rand(0,6.28)
+          });
+        }
+      }
+
+    }else{
+
+      // 单个大型爱心，包含多层发光粒子
+
+      const total=count===5?620:480;
+
+      for(let i=0;i<total;i++){
+
+        const angle=i/total*Math.PI*2;
+        const q=heart(angle);
+
+        const layer=i%3===0
+          ?rand(.22,.85)
+          :rand(.87,1.02);
+
+        particles.push({
+          dx:q.x*radius*layer,
+          dy:q.y*radius*layer,
+          hx:0,
+          hy:0,
+          color:colors[i%colors.length],
+          life:rand(2.6,3.7),
+          width:rand(.75,1.9),
+          multi:false,
+          phase:rand(0,6.28)
+        });
+
+      }
+    }
+
+    shells.push({
+      x,y,
+      born:performance.now(),
+      particles,
+      number:count,
+      color:colors[0],
+      radius,
+      announced:false
+    });
+
+    if(count===5){
+      counter.disabled=true;
+      counter.textContent="5 / 5";
+    }
+
+    if(!frame){
+      frame=requestAnimationFrame(draw);
+    }
+  }
+
+  // 从鼠标或手指点击的位置绽放
+  c.onclick=e=>{
+    ignite(e.clientX,e.clientY);
+  };
+
+  room.querySelector("button").onclick=()=>{
+    ignite(w/2,h*.40);
+  };
+
+  function position(s,p,t){
+
+    t=Math.max(0,t);
+
+    const expansion=1-Math.exp(-2.7*t);
+
+    const smallExpansion=
+      1-Math.exp(-5*Math.max(0,t-.15));
+
+    return [
+      s.x+p.dx*expansion+p.hx*smallExpansion,
+
+      s.y+p.dy*expansion+p.hy*smallExpansion
+        +Math.min(w,h)*.018*t*t
+    ];
+  }
+
+  function draw(now){
+
+    if(!room.isConnected){
+      frame=0;
+      return;
+    }
+
+    if(w!==innerWidth||h!==innerHeight){
+      resize();
+    }
+
+    ctx.globalAlpha=1;
+    ctx.clearRect(0,0,w,h);
+    ctx.globalCompositeOperation="lighter";
+
+    for(let i=shells.length-1;i>=0;i--){
+
+      const s=shells[i];
+
+      let t=(now-s.born)/1000-.55;
+
+      // 烟花升空的金色拖尾
+      if(t<0&&!reduced){
+
+        const progress=Math.max(0,(t+.55)/.55);
+
+        const ry=h+(s.y-h)*progress;
+
+        ctx.globalAlpha=.9;
+        ctx.strokeStyle="#ffd78b";
+        ctx.lineWidth=2;
+
+        ctx.beginPath();
+        ctx.moveTo(s.x,ry+35);
+        ctx.lineTo(s.x,ry);
+        ctx.stroke();
+
+        ctx.fillStyle="#fff6dc";
+
+        ctx.beginPath();
+        ctx.arc(s.x,ry,2.6,0,Math.PI*2);
+        ctx.fill();
+
+        continue;
+      }
+
+      // 第五次烟花出现周年纪念祝福
+      if(s.number===5&&!s.announced){
+
+        s.announced=true;
+        greeting.hidden=false;
+
+        counter.disabled=false;
+        counter.textContent="重新放烟花 ♡";
+        counter.onclick=()=>move(8);
+      }
+
+      if(reduced){
+
+        if(now-s.born>1600){
+          shells.splice(i,1);
+          continue;
+        }
+
+        t=1.15;
+      }
+
+      if(t>3.8){
+        shells.splice(i,1);
+        continue;
+      }
+
+      // 烟花周围的柔和光晕
+      const glow=ctx.createRadialGradient(
+        s.x,s.y,0,
+        s.x,s.y,s.radius*1.15
+      );
+
+      glow.addColorStop(0,s.color);
+      glow.addColorStop(1,"transparent");
+
+      ctx.globalAlpha=.09*Math.max(0,1-t/3.8);
+      ctx.fillStyle=glow;
+      ctx.fillRect(0,0,w,h);
+
+      for(const p of s.particles){
+
+        if(t>p.life)continue;
+
+        const fade=Math.min(
+          1,(1-t/p.life)*1.9
+        );
+
+        const shimmer=.6+.4*Math.abs(
+          Math.sin(p.phase+t*13)
+        );
+
+        const head=position(s,p,t);
+
+        const tail=position(
+          s,p,t-(p.multi?.055:.28)
+        );
+
+        // 发光拖尾
+        ctx.globalAlpha=fade*.8;
+
+        ctx.strokeStyle=p.color;
+        ctx.lineWidth=p.width;
+        ctx.lineCap="round";
+
+        ctx.beginPath();
+        ctx.moveTo(tail[0],tail[1]);
+        ctx.lineTo(head[0],head[1]);
+        ctx.stroke();
+
+        // 闪烁的烟花粒子
+        ctx.globalAlpha=fade*shimmer;
+        ctx.fillStyle=p.color;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          head[0],head[1],
+          p.width*.85,
+          0,Math.PI*2
+        );
+
+        ctx.fill();
+      }
+    }
+
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation="source-over";
+
+    if(shells.length){
+      frame=requestAnimationFrame(draw);
+    }else{
+      frame=0;
+    }
+  }
 }
-function fireworks(done=()=>{}){
- stopFireworks();
- const c=$("fx"),ctx=c.getContext("2d");
- if(matchMedia("(prefers-reduced-motion: reduce)").matches){done();return}
- document.body.classList.add("show-fireworks");
- const dpr=Math.min(devicePixelRatio||1,2),w=innerWidth,h=innerHeight;
- c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
- const palettes=[["#478aff","#85c5ff"],["#ffd34b","#fff0a5"],["#44df85","#b3ffc1"],["#f65a9c","#ffc0dc"],["#a879ed","#dfbaff"],["#ff833c","#ffc17b"],["#e9b55a","#fff4cd"]];
- const rockets=[],particles=[],flashes=[];
- const scale=Math.min(w,h), rand=(a,b)=>a+Math.random()*(b-a);
- const schedule=[0,950,2050,3250,4500,5700,6800,7850,8700,9550,10350,11000,11600,12200,12800,13200];
- let start=performance.now(),last=start,next=0;
- function launch(i,now){
-  const finale=i>=11, x=w*(finale?rand(.19,.81):rand(.28,.72)), y=h*rand(.22,.47);
-  rockets.push({x,y,fromX:w*rand(.38,.62),born:now,duration:rand(650,1050),palette:palettes[i%palettes.length],style:i%4,trail:[]});
- }
- function burst(r,now){
-  const count= Math.min(230,Math.max(130,Math.round(scale*.29))), radius=scale*rand(.23,.38);
-  flashes.push({x:r.x,y:r.y,born:now,radius:radius*.17});
-  for(let j=0;j<count;j++){
-   // Radial shells with random variation, not drawn silhouettes.
-   const angle=j/count*Math.PI*2+rand(-.09,.09);
-   const speed=radius*rand(1.05,1.7)*(r.style===1?rand(.48,1):1);
-   const color=r.style===3?"#edbd73":r.palette[Math.random()<.23?1:0];
-   particles.push({x:r.x,y:r.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,age:0,life:rand(1.65,3.0)+(r.style===3?.8:0),drag:r.style===3?.77:1.08,gravity:scale*(r.style===3?.13:.105),color,tail:[],size:rand(.65,1.55),twinkle:Math.random()<.32,phase:rand(0,6.28),style:r.style});
-  }
-  // A small bright inner core adds depth to each burst.
-  for(let j=0;j<32;j++){
-   const a=rand(0,Math.PI*2),v=radius*rand(.15,.65);
-   particles.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,age:0,life:rand(.55,1.3),drag:1.5,gravity:scale*.12,color:"#fff0b8",tail:[],size:rand(.65,1.2),twinkle:false,phase:0,style:0});
-  }
- }
- function streak(points,color,alpha,width){
-  if(points.length<2)return;
-  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap="round";
-  for(let j=1;j<points.length;j++){
-   ctx.globalAlpha=alpha*(j/points.length)**1.7;
-   ctx.beginPath();ctx.moveTo(points[j-1][0],points[j-1][1]);ctx.lineTo(points[j][0],points[j][1]);ctx.stroke();
-  }
- }
- function draw(now){
-  const elapsed=now-start,dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
-  ctx.clearRect(0,0,w,h);ctx.globalCompositeOperation="lighter";
-  while(next<schedule.length&&elapsed>=schedule[next])launch(next++,now);
-  for(let i=rockets.length-1;i>=0;i--){
-   const r=rockets[i],t=Math.min(1,(now-r.born)/r.duration),e=1-(1-t)**1.55;
-   const x=r.fromX+(r.x-r.fromX)*t,y=h-(h-r.y)*e;
-   r.trail.push([x,y]);if(r.trail.length>20)r.trail.shift();
-   streak(r.trail,"#f6b95f",.9,1.8);
-   ctx.globalAlpha=1;ctx.fillStyle="#fff4ce";ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
-   if(t>=1){burst(r,now);rockets.splice(i,1)}
-  }
-  for(let i=flashes.length-1;i>=0;i--){
-   const f=flashes[i],t=(now-f.born)/180;if(t>=1){flashes.splice(i,1);continue}
-   const g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,Math.max(1,f.radius*(.5+t)));
-   g.addColorStop(0,"rgba(255,242,200,.8)");g.addColorStop(1,"rgba(255,180,80,0)");
-   ctx.globalAlpha=(1-t)**2;ctx.fillStyle=g;ctx.fillRect(f.x-f.radius*2,f.y-f.radius*2,f.radius*4,f.radius*4);
-  }
-  for(let i=particles.length-1;i>=0;i--){
-   const p=particles[i];p.age+=dt;const t=p.age/p.life;if(t>=1){particles.splice(i,1);continue}
-   const drag=Math.exp(-p.drag*dt);p.vx*=drag;p.vy=p.vy*drag+p.gravity*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
-   p.tail.push([p.x,p.y]);const maxTail=p.style===3?21:10;if(p.tail.length>maxTail)p.tail.shift();
-   const fade=Math.min(1,(1-t)*2.25), shimmer=p.twinkle?(.35+.65*Math.pow(Math.sin(p.phase+p.age*23),2)):1;
-   const color=t>.72?"#e5aa60":p.color;
-   streak(p.tail,color,fade*.72,p.size*.8);
-   ctx.globalAlpha=fade*shimmer;ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
-   if(t<.37){ctx.globalAlpha=fade*.75;ctx.fillStyle="#fff8df";ctx.beginPath();ctx.arc(p.x,p.y,p.size*.47,0,Math.PI*2);ctx.fill()}
-  }
-  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
-  if(next<schedule.length||particles.length||rockets.length||flashes.length)frame=requestAnimationFrame(draw);else{stopFireworks();done()}
- }
- frame=requestAnimationFrame(draw);
-}
+
 window.addEventListener("pageshow",e=>{if(e.persisted)move(0)});
 render();
 </script></body></html>
