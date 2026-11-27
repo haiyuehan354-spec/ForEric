@@ -352,11 +352,11 @@ const stub=home.querySelector(".ticket-stub");stub.onclick=()=>{stub.disabled=tr
 case 7:musicRoom();break;
 
 case 1: case 2: case 3: case 4: question(QUESTIONS[state.step-1]);break;
-case 5:add("small","番外 · 时光收藏夹");add("h2","把日子装进相册");let grid=add("div",undefined,"photos");GALLERY.forEach(p=>{let b=button("",()=>{if(img.complete&&img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("这张照片还等待你放入 assets 文件夹。")},"photo");let img=el("img");img.alt=p.caption;let ph=el("div","待收藏的照片","placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));grid.append(b)});nav(()=>move(8),"开启最终惊喜 ♡");break;
+case 5:add("small","时光收藏夹");add("h2","把回忆装进相册");let grid=add("div",undefined,"photos");GALLERY.forEach(p=>{let b=button("",()=>{if(img.complete&&img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("这张照片还等待你放入 assets 文件夹。")},"photo");let img=el("img");img.alt=p.caption;let ph=el("div","待收藏的照片","placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));grid.append(b)});nav(()=>move(8),"开启最终惊喜 ♡");break;
 case 8:fireRoom();break;
 case 9:carouselRoom();break;
 case 10:giftRoom();break;
-case 6:add("small","终章 · HAPPY ANNIVERSARY");add("h1","一周年快乐 ♡");add("p","365天只是我们的开始。\n谢谢你走进我的世界里，\n我爱你 \n2025.12.03 — Forever ");page.append(button("← 返回扭蛋机",()=>move(10)),button("重新翻阅我们的故事",()=>move(0),"primary"));break;
+case 6:add("small","终章 · HAPPY ANNIVERSARY");add("h1","一周年快乐 ♡");add("p","365天是我们的开始\n谢谢你走进我的世界里\n我爱你 \n2025.12.03 — Forever ");page.append(button("← 返回扭蛋机",()=>move(10)),button("重新翻阅我们的故事",()=>move(0),"primary"));break;
 }}
 let audioStarted=false,musicUnlocked=false;
 function syncMusicButton(){$("music").hidden=!musicUnlocked||state.step===0||state.step===7}
