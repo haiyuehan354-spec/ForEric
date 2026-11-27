@@ -103,17 +103,17 @@ function move(n){stopFireworks();if(n===0){state=freshState();resetMusic()}else{
 function nav(next,label="翻开下一页 →"){let n=add("div",undefined,"nav");if(state.step>0)n.append(button("← 上一页",()=>move(state.step===1?7:state.step===5?9:state.step-1)));else n.append(el("span"));n.append(button(label,next,"primary"))}
 function message(t){$("msg").textContent=t}
 const GALLERY = [
-    { src: "assets/gallery1.jpg", caption: "Time square" },
-    { src: "assets/gallery2.jpg", caption: "在波多黎各的一个海滩上" },
-    { src: "assets/gallery3.jpg", caption: "刚在一起的两个人" },
-    { src: "assets/gallery4.jpg", caption: "在雨林里变成两只猴子" },
+    { src: "assets/gallery1.jpg", caption: "第一次一起去Time square，穿着黑色衣服酷酷的两个人" },
+    { src: "assets/gallery2.jpg", caption: "在波多黎各的一个海滩上，我们还发现了爱心形状的石头坑" },
+    { src: "assets/gallery3.jpg", caption: "刚在一起的两个人，还没有太多合照" },
+    { src: "assets/gallery4.jpg", caption: "在雨林里变成两只猴子上蹿下跳，好喜欢跟你一起探险呀" },
 ];
 const QUESTIONS = [
   {
     "key": "restaurant",
     "chapter": "第一章",
-    "title": "我们第一次两个人去的餐厅是哪里？(o^^o)",
-    "intro": "好怀念！",
+    "title": "我们第一次两个人去的餐厅是哪里？",
+    "intro": "送分题哦！",
     "options": [
       "Five guys",
       "Pasta Corner",
@@ -181,7 +181,7 @@ function memory(q){
  add("h2",q.correct==="all"?"因为是你，所以全部喜欢。":"答对啦！");
  const b=button("",()=>{if(img.naturalWidth){$("large").src=p.src;$("large").alt=p.caption;$("viewer").showModal()}else message("请添加 "+p.src)},"photo memory-photo");
  const img=el("img");img.alt=p.caption;const ph=el("div","待收藏的照片 · "+p.src,"placeholder");ph.hidden=true;img.onerror=()=>{img.hidden=true;ph.hidden=false};img.src=p.src;b.append(img,ph,el("div",p.caption));page.append(b);
- add("p",["吃完之后我们去了moma看展，这是我们第一次约会哦～","本命年手链，装着老公大大的心意。","喜欢跟你旅行，我们会一起去很多次海边！","喜欢你的一切"][state.step-1]);
+ add("p",["意面好好吃！吃饭的时候，我跟你说了很多心事，吃完之后我们去了moma看展，这是我们第一次约会哦～","本命年的红色手链，你一定选了很久吧～装着老公大大的心意。","喜欢跟你旅行，我们会一起去很多次海边！","喜欢你的 一切"][state.step-1]);
  const n=add("div",undefined,"nav");n.append(button("← 返回题目",()=>{state.memory=false;save();render()}),button(state.step===4?"去坐旋转木马 →":"翻开下一页 →",()=>move(state.step===4?9:state.step+1),"primary"));
 }
 function question(q){
